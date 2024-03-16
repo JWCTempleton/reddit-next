@@ -4,11 +4,9 @@ import { auth, getUser, signOut } from "@/auth";
 
 export default async function NavBar() {
   const loggedInUser = await auth();
-  console.log("basic", loggedInUser);
 
   const userEmail = loggedInUser?.user?.email?.toString();
   const user = await getUser(userEmail);
-  console.log("USER", user);
 
   const forums = await fetchDefaultForums();
   return (
@@ -24,7 +22,7 @@ export default async function NavBar() {
             <li key={t.id}>
               <Link
                 className={"text-blue-500 hover:text-blue-800"}
-                href={`${t.forum_name}`}
+                href={`/t/${t.forum_name}`}
               >
                 {t.forum_name}
               </Link>
@@ -34,7 +32,15 @@ export default async function NavBar() {
       </div>
       {loggedInUser && (
         <div className="flex">
-          <span className="px-3">Welcome, {user.username}</span>
+          <span className="px-3">
+            Welcome,{" "}
+            <Link
+              className={"text-blue-500 hover:text-blue-800 hover:underline"}
+              href={`/user/${user.username}`}
+            >
+              {user.username}
+            </Link>
+          </span>
 
           <form
             action={async () => {
@@ -42,7 +48,11 @@ export default async function NavBar() {
               await signOut();
             }}
           >
-            <button>Sign Out</button>
+            <button
+              className={"text-red-400 hover:text-red-600 hover:underline"}
+            >
+              Sign Out
+            </button>
           </form>
         </div>
       )}

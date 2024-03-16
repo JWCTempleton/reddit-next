@@ -1,4 +1,5 @@
 import { Post } from "@/app/lib/definitions";
+import Link from "next/link";
 const dayjs = require("dayjs");
 
 export default function PostCard({
@@ -100,7 +101,19 @@ export default function PostCard({
         <div className="">
           <p>
             Submitted at {dayjs(posted_at).format("MMM DD, YYYY h:m:ss A")} by{" "}
-            {submitted_by} in {forum_name}
+            <Link
+              className={"text-blue-500 hover:text-blue-800"}
+              href={`/user/${submitted_by}`}
+            >
+              {submitted_by}
+            </Link>{" "}
+            in{" "}
+            <Link
+              className={"text-blue-500 hover:text-blue-800"}
+              href={`/t/${forum_name}`}
+            >
+              {forum_name}
+            </Link>
           </p>
         </div>
       </div>

@@ -23,6 +23,7 @@ export default async function Page({
               url={p.url}
               submitted_by={p.username}
               posted_at={p.created_at}
+              comments={p.comments}
             />
           );
         })}

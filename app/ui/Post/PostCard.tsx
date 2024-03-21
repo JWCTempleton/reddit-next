@@ -9,6 +9,7 @@ export default function PostCard({
   submitted_by,
   posted_at,
   votes,
+  comments,
 }: Post) {
   function displayUpArrow(vote: boolean) {
     if (vote === true) {
@@ -113,6 +114,15 @@ export default function PostCard({
               href={`/t/${forum_name}`}
             >
               {forum_name}
+            </Link>
+          </p>
+          <p>
+            <Link className={"text-blue-500 hover:text-blue-800"} href={"#"}>
+              {comments
+                ? comments === "1"
+                  ? `${comments} comment`
+                  : `${comments} comments`
+                : `0 comments`}
             </Link>
           </p>
         </div>

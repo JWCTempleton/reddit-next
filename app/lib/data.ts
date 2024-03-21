@@ -1,4 +1,5 @@
 import { query } from "@/db";
+import postcss from "postcss";
 
 // DEFAULT forums that all non logged in users see on page load
 export async function fetchDefaultForums() {
@@ -6,8 +7,12 @@ export async function fetchDefaultForums() {
     console.log(`Fetching forum data`);
 
     const data = await query(
-      `SELECT forums.id, forums.forum_name, forums.owner_id, forums.created_at, forums.is_suspended, users.username FROM forums 
-      JOIN users on users.id = forums.owner_id WHERE forums.is_default = true;`
+      `
+      SELECT forums.id, forums.forum_name, forums.owner_id, forums.created_at, forums.is_suspended, users.username 
+      FROM forums 
+      JOIN users on users.id = forums.owner_id 
+      WHERE forums.is_default = true;
+      `
     );
 
     return data.rows;
@@ -23,13 +28,21 @@ export async function fetchDefaultPosts() {
     console.log("Fetching post data");
 
     const data = await query(`
-            SELECT posts.id, posts.title, posts.url, posts.content, posts.created_at, posts.is_self_post, users.username, forums.forum_name, forums.is_default, sum(upvoted_posts.vote) AS votes
+    WITH comment_count AS (
+      SELECT post_id, count(comment) AS comments FROM post_comments
+    JOIN posts on posts.id = post_comments.post_id
+    JOIN forums on forums.id = posts.forum_id
+    WHERE forums.is_default = true
+    GROUP BY post_id, forums.forum_name
+    )
+            SELECT posts.id, posts.title, posts.url, posts.content, posts.created_at, posts.is_self_post, users.username, forums.forum_name, forums.is_default, sum(upvoted_posts.vote) AS votes, comments
             FROM posts
             JOIN users on users.id = posts.submitted_by
             JOIN forums on forums.id = posts.forum_id
             JOIN upvoted_posts on upvoted_posts.post_id = posts.id
+            FULL OUTER JOIN comment_count USING (post_id)
             WHERE forums.is_default = true
-            GROUP BY posts.id, users.username, forums.forum_name, forums.is_default
+            GROUP BY posts.id, users.username, forums.forum_name, forums.is_default, comment_count.comments, comment_count.post_id
             ORDER BY votes DESC;
         `);
     return data.rows;
@@ -39,7 +52,7 @@ export async function fetchDefaultPosts() {
   }
 }
 
-//Query to return comments for authenticated user
+//Query to return comments and posts made by user
 export async function fetchUserPostsAndComments(username: string) {
   try {
     const data = await query(`
@@ -94,14 +107,23 @@ export async function fetchUserPostsAndComments(username: string) {
 export async function fetchForumPosts(forumName: string) {
   try {
     const data = await query(`
-    SELECT posts.id, posts.title, posts.url, posts.content, posts.created_at, posts.is_self_post, users.username, forums.forum_name, sum(upvoted_posts.vote) AS votes
-    FROM posts
-    JOIN users on users.id = posts.submitted_by
+    WITH comment_count AS (
+      SELECT post_id, count(comment) AS comments FROM post_comments
+    JOIN posts on posts.id = post_comments.post_id
     JOIN forums on forums.id = posts.forum_id
-    JOIN upvoted_posts on upvoted_posts.post_id = posts.id
+    
     WHERE forums.forum_name = '${forumName}'
-    GROUP BY posts.id, users.username, forums.forum_name, forums.is_default
-    ORDER BY votes DESC; 
+    
+    GROUP BY post_id, forums.forum_name
+    )
+    SELECT posts.id, posts.title, posts.url, posts.content, posts.created_at, posts.is_self_post, users.username, forums.forum_name, sum(upvoted_posts.vote) AS votes, comments
+        FROM posts
+        JOIN users on users.id = posts.submitted_by
+        JOIN forums on forums.id = posts.forum_id
+        JOIN upvoted_posts on upvoted_posts.post_id = posts.id
+        FULL OUTER JOIN comment_count USING (post_id)
+        WHERE forums.forum_name = '${forumName}'
+        GROUP BY posts.id, users.username, forums.forum_name, comment_count.comments, comment_count.post_id;
     `);
     return data.rows;
   } catch (error) {
@@ -109,3 +131,12 @@ export async function fetchForumPosts(forumName: string) {
     throw new Error("Failed to fetch forum post data.");
   }
 }
+
+// SELECT posts.id, posts.title, posts.url, posts.content, posts.created_at, posts.is_self_post, users.username, forums.forum_name, sum(upvoted_posts.vote) AS votes
+// FROM posts
+// JOIN users on users.id = posts.submitted_by
+// JOIN forums on forums.id = posts.forum_id
+// JOIN upvoted_posts on upvoted_posts.post_id = posts.id
+// WHERE forums.forum_name = 'nba'
+// GROUP BY posts.id, users.username, forums.forum_name, forums.is_default
+// ORDER BY votes DESC;

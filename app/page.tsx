@@ -3,6 +3,7 @@ import PostCard from "./ui/Post/PostCard";
 
 export default async function Home() {
   const posts = await fetchDefaultPosts();
+  console.log("POSTS", posts);
 
   return (
     <main className="flex flex-col items-center">
@@ -20,6 +21,7 @@ export default async function Home() {
               url={p.url}
               submitted_by={p.username}
               posted_at={p.created_at}
+              comments={p.comments}
             />
           );
         })}

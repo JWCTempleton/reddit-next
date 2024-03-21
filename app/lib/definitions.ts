@@ -6,6 +6,7 @@ export type Post = {
   posted_at: string;
   url: string | undefined;
   votes: number;
+  comments: string | null;
 };
 
 export type User = {

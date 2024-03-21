@@ -10,6 +10,7 @@ export default function PostCard({
   posted_at,
   votes,
   comments,
+  post_id,
 }: Post) {
   function displayUpArrow(vote: boolean) {
     if (vote === true) {
@@ -91,12 +92,19 @@ export default function PostCard({
         <div className="flex flex-col">
           {url ? (
             <h1>
-              <a className="underline text-sky-500" href={url && `${url}`}>
+              <Link className="underline text-sky-500" href={url && `${url}`}>
                 {title}
-              </a>
+              </Link>
             </h1>
           ) : (
-            <h1>{title}</h1>
+            <h1>
+              <Link
+                className="underline text-sky-500"
+                href={`/t/${forum_name}/${post_id}`}
+              >
+                {title}
+              </Link>
+            </h1>
           )}
         </div>
         <div className="">
@@ -117,7 +125,10 @@ export default function PostCard({
             </Link>
           </p>
           <p>
-            <Link className={"text-blue-500 hover:text-blue-800"} href={"#"}>
+            <Link
+              className={"text-blue-500 hover:text-blue-800"}
+              href={`/t/${forum_name}/${post_id}`}
+            >
               {comments
                 ? comments === "1"
                   ? `${comments} comment`

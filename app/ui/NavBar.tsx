@@ -10,7 +10,7 @@ export default async function NavBar() {
 
   const forums = await fetchDefaultForums();
   return (
-    <nav className="flex justify-between w-[100vw] px-4">
+    <nav className="flex flex-col w-[100vw] px-4">
       <div>
         <ul className="flex space-x-4">
           <li>
@@ -30,32 +30,39 @@ export default async function NavBar() {
           ))}
         </ul>
       </div>
-      {loggedInUser && (
-        <div className="flex">
-          <span className="px-3">
-            Welcome,{" "}
-            <Link
-              className={"text-blue-500 hover:text-blue-800 hover:underline"}
-              href={`/user/${user.username}`}
-            >
-              {user.username}
-            </Link>
-          </span>
+      <div>
+        {loggedInUser && (
+          <div className="flex justify-between pt-4">
+            <h1 className="text-xl bold">Tronnit</h1>
+            <div className="flex">
+              <span className="pr-3">
+                Welcome,{" "}
+                <Link
+                  className={
+                    "text-blue-500 hover:text-blue-800 hover:underline"
+                  }
+                  href={`/user/${user.username}`}
+                >
+                  {user.username}
+                </Link>
+              </span>
 
-          <form
-            action={async () => {
-              "use server";
-              await signOut();
-            }}
-          >
-            <button
-              className={"text-red-400 hover:text-red-600 hover:underline"}
-            >
-              Sign Out
-            </button>
-          </form>
-        </div>
-      )}
+              <form
+                action={async () => {
+                  "use server";
+                  await signOut();
+                }}
+              >
+                <button
+                  className={"text-red-400 hover:text-red-600 hover:underline"}
+                >
+                  Sign Out
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
+      </div>
     </nav>
   );
 }

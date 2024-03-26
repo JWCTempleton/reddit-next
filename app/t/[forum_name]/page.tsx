@@ -10,7 +10,8 @@ export default async function Page({
   const posts = await fetchForumPosts(forumName);
 
   return (
-    <main className="flex flex-col items-center">
+    <main className="flex flex-col px-4">
+      <h1 className="text-xl bold pt-4">{forumName}</h1>
       <div>
         {posts.map((p) => {
           return (

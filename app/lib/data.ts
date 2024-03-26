@@ -132,6 +132,35 @@ export async function fetchForumPosts(forumName: string) {
   }
 }
 
+//Query to return specific post based on post id
+export async function fetchPost(post_id: string) {
+  try {
+    const data = await query(`
+    WITH comment_count AS (
+      SELECT post_id, count(comment) AS comments FROM post_comments
+    JOIN posts on posts.id = post_comments.post_id
+    JOIN forums on forums.id = posts.forum_id
+    
+    WHERE posts.id = '${post_id}'
+    
+    GROUP BY post_id
+    )
+    SELECT posts.id, posts.title, posts.url, posts.content, posts.created_at, posts.is_self_post, users.username, forums.forum_name, sum(upvoted_posts.vote) AS votes, comments
+    FROM posts
+    JOIN users on users.id = posts.submitted_by
+    JOIN forums on forums.id = posts.forum_id
+    JOIN upvoted_posts on upvoted_posts.post_id = posts.id
+    FULL OUTER JOIN comment_count USING (post_id)
+    WHERE posts.id = '${post_id}'
+    GROUP BY posts.id, users.username, forums.forum_name, comment_count.comments, comment_count.post_id;
+    `);
+    return data.rows;
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch post data.");
+  }
+}
+
 // SELECT posts.id, posts.title, posts.url, posts.content, posts.created_at, posts.is_self_post, users.username, forums.forum_name, sum(upvoted_posts.vote) AS votes
 // FROM posts
 // JOIN users on users.id = posts.submitted_by

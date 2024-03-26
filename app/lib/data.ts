@@ -1,5 +1,4 @@
 import { query } from "@/db";
-import postcss from "postcss";
 
 // DEFAULT forums that all non logged in users see on page load
 export async function fetchDefaultForums() {

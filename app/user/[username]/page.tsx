@@ -10,7 +10,6 @@ export default async function Page({
   const username = params.username;
 
   const data = await fetchUserPostsAndComments(username);
-  console.log("POSTS AND COMMENTS", data);
   if (data.length === 0) {
     return (
       <div className="m-5">

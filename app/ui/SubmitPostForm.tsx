@@ -116,22 +116,3 @@ export default function SubmitPostForm({
     </form>
   );
 }
-
-// function LoginButton() {
-//   const { pending } = useFormStatus();
-//   return (
-//     <Button className="mt-4 p-6 flex" aria-disabled={pending}>
-//       Log in <ArrowRightIcon className="ml-auto h-5 w-5 text-gray-50" />
-//     </Button>
-//   );
-// }
-
-// function SignUpButton() {
-//   return (
-//     <Link href={"/signup"}>
-//       <Button className="mt-4 p-6 w-auto transition-colors bg-green-600 active:bg-green-500 hover:bg-green-500 focus-visible:outline-green-500 ">
-//         Sign Up <CheckCircleIcon className="ml-auto h-5 w-5 text-gray-50" />
-//       </Button>
-//     </Link>
-//   );
-// }

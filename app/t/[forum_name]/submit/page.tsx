@@ -20,7 +20,7 @@ export default function Page({ params }: { params: { forum_name: string } }) {
         {!isSelfPost ? (
           <SubmitPostForm params={params} />
         ) : (
-          <SubmitSelfPostForm />
+          <SubmitSelfPostForm params={params} />
         )}
       </div>
     </div>

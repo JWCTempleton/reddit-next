@@ -36,8 +36,15 @@ const LinkPostSchema = z.object({
   content: z.string(),
 });
 
+const SelfPostSchema = z.object({
+  forum: z.string(),
+  title: z.string(),
+  content: z.string(),
+});
+
 const CreateUser = UserSchema;
 const CreateLinkPost = LinkPostSchema;
+const CreateSelfPost = SelfPostSchema;
 
 export async function authenticate(
   prevState: string | undefined,
@@ -140,7 +147,58 @@ export async function createLinkPost(formData: FormData) {
     }
   } catch (error) {
     return {
-      message: "Database error: Failed to find forum data.",
+      message: "Database error: Failed to Create Link Post data.",
+    };
+  }
+
+  revalidatePath(`/t/${forum}`);
+
+  redirect(`/t/${forum}`);
+}
+
+export async function createSelfPost(formData: FormData) {
+  const loggedInUser = await auth();
+  const userEmail = loggedInUser?.user?.email?.toString();
+  const user = await getUser(userEmail);
+
+  const { forum, title, content } = CreateSelfPost.parse({
+    forum: formData.get("forum"),
+    title: formData.get("title"),
+    content: formData.get("content"),
+  });
+
+  try {
+    const forum_data = await query(`
+      SELECT id FROM forums where forum_name = '${forum}';
+    `);
+    const forum_id = forum_data.rows[0].id;
+
+    const values = [forum_id, title, content, user.id, true];
+    const insertPost = await query(
+      `
+      INSERT INTO posts (forum_id, title, content, submitted_by, is_self_post)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING *;
+    `,
+      values
+    );
+    try {
+      const values = [insertPost.rows[0].id, user.id, 1];
+      const insertDefaultUpvote = await query(
+        `
+        INSERT INTO upvoted_posts (post_id, user_id, vote)
+        VALUES ($1, $2, $3)
+      `,
+        values
+      );
+    } catch (error) {
+      return {
+        message: "Database error: Failed to find upvote data.",
+      };
+    }
+  } catch (error) {
+    return {
+      message: "Database error: Failed to create Self Post data.",
     };
   }
 

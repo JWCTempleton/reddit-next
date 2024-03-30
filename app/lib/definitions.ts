@@ -18,3 +18,14 @@ export type User = {
   is_admin: boolean;
   is_suspended: boolean;
 };
+
+export type LinkPostSubmission = {
+  id: string;
+  forum_id: string;
+  title: string;
+  url: string | undefined;
+  content: string;
+  submitted_by: string;
+  created_at: string;
+  is_self_post: boolean;
+};

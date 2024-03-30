@@ -1,4 +1,5 @@
 import { query } from "@/db";
+import { QueryResultRow } from "pg";
 
 // DEFAULT forums that all non logged in users see on page load
 export async function fetchDefaultForums() {
@@ -119,7 +120,7 @@ export async function fetchForumPosts(forumName: string) {
         FROM posts
         JOIN users on users.id = posts.submitted_by
         JOIN forums on forums.id = posts.forum_id
-        JOIN upvoted_posts on upvoted_posts.post_id = posts.id
+        FULL OUTER JOIN upvoted_posts on upvoted_posts.post_id = posts.id
         FULL OUTER JOIN comment_count USING (post_id)
         WHERE forums.forum_name = '${forumName}'
         GROUP BY posts.id, users.username, forums.forum_name, comment_count.comments, comment_count.post_id;
@@ -134,7 +135,7 @@ export async function fetchForumPosts(forumName: string) {
 //Query to return specific post based on post id
 export async function fetchPost(post_id: string) {
   try {
-    const data = await query(`
+    const postById = await query(`
     WITH comment_count AS (
       SELECT post_id, count(comment) AS comments FROM post_comments
     JOIN posts on posts.id = post_comments.post_id
@@ -153,7 +154,34 @@ export async function fetchPost(post_id: string) {
     WHERE posts.id = '${post_id}'
     GROUP BY posts.id, users.username, forums.forum_name, comment_count.comments, comment_count.post_id;
     `);
-    return data.rows;
+
+    const comments = await query(`
+      SELECT * FROM post_comments WHERE post_comments.post_id = '${post_id}'
+      GROUP BY post_comments.id, post_comments.in_reply_to_comment_id
+      ORDER BY post_comments.created_at;
+      
+    `);
+
+    const data = await Promise.all([postById, comments]);
+
+    const idMapping = data[1].rows.reduce((acc, el, i) => {
+      acc[el.id] = i;
+      return acc;
+    }, {});
+
+    let commentTree: any = [];
+    let root;
+    data[1].rows.forEach((el) => {
+      if (el.in_reply_to_comment_id === null) {
+        root = el;
+        commentTree.push(root);
+        return;
+      }
+      const parentEl = data[1].rows[idMapping[el.in_reply_to_comment_id]];
+      parentEl.replies = [...(parentEl.replies || []), el];
+    });
+
+    return [data[0], commentTree];
   } catch (error) {
     console.error("Database Error:", error);
     throw new Error("Failed to fetch post data.");
@@ -168,3 +196,36 @@ export async function fetchPost(post_id: string) {
 // WHERE forums.forum_name = 'nba'
 // GROUP BY posts.id, users.username, forums.forum_name, forums.is_default
 // ORDER BY votes DESC;
+
+// WITH comment_count AS (
+//   SELECT post_id, count(comment) AS comments FROM post_comments
+// JOIN posts on posts.id = post_comments.post_id
+// JOIN forums on forums.id = posts.forum_id
+
+// WHERE posts.id = '${post_id}'
+
+// GROUP BY post_id
+// )
+// SELECT posts.id, posts.title, posts.url, posts.content, posts.created_at, posts.is_self_post, users.username, forums.forum_name, sum(upvoted_posts.vote) AS votes, comments
+// FROM posts
+// JOIN users on users.id = posts.submitted_by
+// JOIN forums on forums.id = posts.forum_id
+// JOIN upvoted_posts on upvoted_posts.post_id = posts.id
+// FULL OUTER JOIN comment_count USING (post_id)
+// WHERE posts.id = '${post_id}'
+// GROUP BY posts.id, users.username, forums.forum_name, comment_count.comments, comment_count.post_id;
+
+// WITH RECURSIVE comments AS (
+//   SELECT id, post_id, user_id, comment, created_at, in_reply_to_comment_id
+//   FROM post_comments
+//   WHERE post_id = '410544b2-4002-4271-9855-fec4b6a6442a'
+
+//   UNION
+
+//   SELECT p.id, p.post_id, p.user_id, p.comment, p.created_at, p.in_reply_to_comment_id
+//   FROM post_comments p
+
+//   INNER JOIN comments c ON c.post_id= p.in_reply_to_comment_id
+// )
+
+// SELECT * FROM comments;

@@ -17,7 +17,11 @@ export default function Page({ params }: { params: { forum_name: string } }) {
       </div>
 
       <div className="">
-        {!isSelfPost ? <SubmitPostForm /> : <SubmitSelfPostForm />}
+        {!isSelfPost ? (
+          <SubmitPostForm params={params} />
+        ) : (
+          <SubmitSelfPostForm />
+        )}
       </div>
     </div>
   );

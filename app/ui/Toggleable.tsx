@@ -7,6 +7,7 @@ import {
   ReactPortal,
   useState,
 } from "react";
+import { Button } from "./Button";
 
 const Toggleable = (props: {
   buttonLabel:
@@ -42,11 +43,11 @@ const Toggleable = (props: {
   return (
     <div>
       <div style={hideWhenVisible}>
-        <button onClick={toggleVisibility}>{props.buttonLabel}</button>
+        <Button onClick={toggleVisibility}>{props.buttonLabel}</Button>
       </div>
       <div style={showWhenVisible}>
         {props.children}
-        <button onClick={toggleVisibility}>cancel</button>
+        <Button onClick={toggleVisibility}>cancel</Button>
       </div>
     </div>
   );

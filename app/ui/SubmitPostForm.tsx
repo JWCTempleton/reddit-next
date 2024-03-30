@@ -5,17 +5,23 @@ import {
 } from "@heroicons/react/24/outline";
 import { ArrowRightIcon } from "@heroicons/react/20/solid";
 import { useFormState, useFormStatus } from "react-dom";
-import { authenticate } from "@/app/lib/actions";
+import { authenticate, createLinkPost } from "@/app/lib/actions";
 import { Button } from "./Button";
 import { useState } from "react";
 
 // import Link from "next/link";
 
-export default function SubmitPostForm() {
-  const [errorMessage, dispatch] = useFormState(authenticate, undefined);
+export default function SubmitPostForm({
+  params,
+}: {
+  params: { forum_name: string };
+}) {
+  const forumName = params.forum_name;
+
+  //   const [errorMessage, dispatch] = useFormState(authenticate, undefined);
 
   return (
-    <form action={dispatch} className="space-y-3">
+    <form action={createLinkPost} className="space-y-3">
       <div className="flex-1 rounded-lg bg-gray-50 px-6 pb-4 pt-8">
         <h1 className="mb-3 text-2xl text-blue-500 font-bold">
           Submit a new Link Post
@@ -29,6 +35,9 @@ export default function SubmitPostForm() {
           </p>
         </div>
         <div className="w-full">
+          <div>
+            <input id="forum" name="forum" value={forumName} readOnly />
+          </div>
           <div>
             <label
               className="mb-3 mt-5 block text-xs font-medium text-gray-900"
@@ -88,10 +97,10 @@ export default function SubmitPostForm() {
         <div className="flex justify-around">
           {/* <SignUpButton /> */}
           {/* <LoginButton /> */}
-          <button>Submit</button>
+          <Button>Submit</Button>
         </div>
 
-        <div
+        {/* <div
           className="flex h-8 items-end space-x-1"
           aria-live="polite"
           aria-atomic="true"
@@ -102,7 +111,7 @@ export default function SubmitPostForm() {
               <p className="text-sm text-red-500">{errorMessage}</p>
             </>
           )}
-        </div>
+        </div> */}
       </div>
     </form>
   );

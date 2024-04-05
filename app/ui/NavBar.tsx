@@ -31,7 +31,7 @@ export default async function NavBar() {
         </ul>
       </div>
       <div>
-        {loggedInUser && (
+        {loggedInUser ? (
           <div className="flex justify-between pt-4">
             <h1 className="text-xl bold">Tronnit</h1>
             <div className="flex">
@@ -59,6 +59,25 @@ export default async function NavBar() {
                   Sign Out
                 </button>
               </form>
+            </div>
+          </div>
+        ) : (
+          <div className="flex justify-between pt-4">
+            <h1 className="text-xl bold">Tronnit</h1>
+            <div className="">
+              <Link
+                href={"/login"}
+                className="text-blue-500 hover:text-blue-800 hover:underline"
+              >
+                Login
+              </Link>
+              <span className="px-3"> or </span>
+              <Link
+                href={"/signup"}
+                className="text-blue-500 hover:text-blue-800 hover:underline"
+              >
+                Signup
+              </Link>
             </div>
           </div>
         )}

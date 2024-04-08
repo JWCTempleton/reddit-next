@@ -156,8 +156,12 @@ export async function fetchPost(post_id: string) {
     `);
 
     const comments = await query(`
-      SELECT * FROM post_comments WHERE post_comments.post_id = '${post_id}'
-      GROUP BY post_comments.id, post_comments.in_reply_to_comment_id
+      SELECT post_comments.id, post_comments.post_id, post_comments.user_id, post_comments.comment, 
+      post_comments.created_at, post_comments.in_reply_to_comment_id, users.username
+      FROM post_comments
+      JOIN users on users.id = post_comments.user_id
+      WHERE post_comments.post_id = '${post_id}'
+      GROUP BY post_comments.id, post_comments.in_reply_to_comment_id, users.username
       ORDER BY post_comments.created_at;
       
     `);

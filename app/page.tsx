@@ -5,10 +5,8 @@ export default async function Home() {
   const posts = await fetchDefaultPosts();
 
   return (
-    <main className="flex flex-col items-center">
+    <main className="flex flex-col ml-4">
       <div>
-        <p>Tronnit</p>
-
         {posts.map((p) => {
           return (
             <PostCard

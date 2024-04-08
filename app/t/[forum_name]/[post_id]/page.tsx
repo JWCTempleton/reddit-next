@@ -1,6 +1,8 @@
 import { fetchPost } from "@/app/lib/data";
 import PostCard from "@/app/ui/Post/PostCard";
 import Toggleable from "@/app/ui/Toggleable";
+import Link from "next/link";
+const dayjs = require("dayjs");
 
 export default async function Page({
   params,
@@ -13,6 +15,8 @@ export default async function Page({
   const post = await fetchPost(postID);
   const postData = post[0].rows;
   const commentData = post[1];
+
+  console.log("COMMENTS", commentData);
 
   return (
     <div className="px-4">
@@ -68,13 +72,27 @@ export default async function Page({
 
 export const displayReplies = (arr: {
   id: any;
-  comment?: any;
-  replies?: any;
+  comment?: string;
+  replies?: string[];
+  username?: string;
+  created_at?: any;
 }) => {
   return (
-    <div key={arr.id}>
+    <div
+      key={arr.id}
+      className="flex flex-col rounded-md border-2 p-4 gap-4 my-4"
+    >
+      <p>
+        <Link
+          className={"text-blue-500 hover:text-blue-800"}
+          href={`/user/${arr.username}`}
+        >
+          {arr.username}
+        </Link>{" "}
+        posted at {dayjs(arr.created_at).format("MMM DD, YYYY h:m:ss A")}
+      </p>
       <p>{arr.comment}</p>
-      <div className="pl-3">
+      <div className="pl-3 pt-3 my-0">
         {arr.replies &&
           arr.replies.map((arr2: any) => {
             return displayReplies(arr2);

@@ -16,8 +16,6 @@ export default async function Page({
   const postData = post[0].rows;
   const commentData = post[1];
 
-  console.log("COMMENTS", commentData);
-
   return (
     <div className="px-4">
       <h1 className="text-xl bold pt-4">{forumName}</h1>
@@ -55,7 +53,7 @@ export default async function Page({
                     name="content"
                     rows={6}
                     placeholder="Enter comment"
-                    minLength={6}
+                    minLength={1}
                   />
                 </div>
               </Toggleable>
@@ -92,6 +90,21 @@ export const displayReplies = (arr: {
         posted at {dayjs(arr.created_at).format("MMM DD, YYYY h:m:ss A")}
       </p>
       <p>{arr.comment}</p>
+      <p>
+        <Toggleable buttonLabel={"Reply"}>
+          <div>
+            <textarea
+              className="peer block w-[500px] rounded-md border border-gray-200 py-[9px] pl-8 text-sm outline-2 placeholder:text-gray-500 text-sky-800 mb-4"
+              id="content"
+              required
+              name="content"
+              rows={6}
+              placeholder="Enter reply"
+              minLength={1}
+            />
+          </div>
+        </Toggleable>
+      </p>
       <div className="pl-3 pt-3 my-0">
         {arr.replies &&
           arr.replies.map((arr2: any) => {

@@ -5,7 +5,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { ArrowRightIcon } from "@heroicons/react/20/solid";
 import { useFormState, useFormStatus } from "react-dom";
-import { authenticate, createLinkPost } from "@/app/lib/actions";
+import { createLinkPost } from "@/app/lib/actions";
 import { Button } from "./Button";
 import { useState } from "react";
 

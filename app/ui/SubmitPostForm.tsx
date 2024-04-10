@@ -9,8 +9,6 @@ import { createLinkPost } from "@/app/lib/actions";
 import { Button } from "./Button";
 import { useState } from "react";
 
-// import Link from "next/link";
-
 export default function SubmitPostForm({
   params,
 }: {
@@ -36,7 +34,7 @@ export default function SubmitPostForm({
         </div>
         <div className="w-full">
           <div>
-            <input id="forum" name="forum" value={forumName} readOnly />
+            <input id="forum" name="forum" value={forumName} readOnly hidden />
           </div>
           <div>
             <label

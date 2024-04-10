@@ -10,16 +10,8 @@ import {
 import { Button } from "./Button";
 
 const Toggleable = (props: {
-  buttonLabel:
-    | string
-    | number
-    | boolean
-    | ReactElement<any, string | JSXElementConstructor<any>>
-    | Iterable<ReactNode>
-    | ReactPortal
-    | PromiseLikeOfReactNode
-    | null
-    | undefined;
+  buttonLabel: string;
+
   children:
     | string
     | number
@@ -41,13 +33,18 @@ const Toggleable = (props: {
   };
 
   return (
-    <div>
+    <div className="flex">
       <div style={hideWhenVisible}>
         <Button onClick={toggleVisibility}>{props.buttonLabel}</Button>
       </div>
       <div style={showWhenVisible}>
         {props.children}
-        <Button onClick={toggleVisibility}>cancel</Button>
+        <Button
+          onClick={toggleVisibility}
+          className="bg-red-500 hover:bg-red-600 justify-items-end"
+        >
+          cancel
+        </Button>
       </div>
     </div>
   );

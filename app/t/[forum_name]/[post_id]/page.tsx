@@ -2,8 +2,6 @@ import { fetchPost } from "@/app/lib/data";
 import { DisplayReplies } from "@/app/ui/Comments/DisplayReplies";
 import PostCard from "@/app/ui/Post/PostCard";
 import Toggleable from "@/app/ui/Toggleable";
-import Link from "next/link";
-const dayjs = require("dayjs");
 
 export default async function Page({
   params,
@@ -12,7 +10,6 @@ export default async function Page({
 }) {
   const postID = params.post_id;
   const forumName = params.forum_name;
-
   const post = await fetchPost(postID);
   const postData = post[0].rows;
   const commentData = post[1];
@@ -66,13 +63,15 @@ export default async function Page({
         (c: {
           id: any;
           comment?: string;
-          replies?: string[];
+          replies?: any[];
           username?: string;
           created_at?: any;
         }) => {
           return (
             <div key={c.id}>
               <DisplayReplies
+                forumName={forumName}
+                postID={postID}
                 id={c.id}
                 comment={c.comment}
                 replies={c.replies || undefined}

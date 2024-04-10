@@ -32,8 +32,8 @@ export default async function NavBar() {
       </div>
       <div>
         {loggedInUser ? (
-          <div className="flex justify-between pt-4">
-            <h1 className="text-xl bold">Tronnit</h1>
+          <div className="flex justify-between pt-4 items-end">
+            <h1 className="text-3xl bold">Tronnit</h1>
             <div className="flex">
               <span className="pr-3">
                 Welcome,{" "}

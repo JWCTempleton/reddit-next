@@ -33,7 +33,7 @@ export default function SubmitSelfPostForm({
         </div>
         <div className="w-full">
           <div>
-            <input id="forum" name="forum" value={forumName} readOnly />
+            <input id="forum" name="forum" value={forumName} readOnly hidden />
           </div>
           <div>
             <label

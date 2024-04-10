@@ -49,10 +49,17 @@ const ReplySchema = z.object({
   forum: z.string(),
 });
 
+const CommentSchema = z.object({
+  postID: z.string(),
+  content: z.string(),
+  forum: z.string(),
+});
+
 const CreateUser = UserSchema;
 const CreateLinkPost = LinkPostSchema;
 const CreateSelfPost = SelfPostSchema;
 const CreateReply = ReplySchema;
+const CreateComment = CommentSchema;
 
 export async function authenticate(
   prevState: string | undefined,
@@ -256,6 +263,51 @@ export async function createReply(formData: FormData) {
   } catch (error) {
     return {
       message: "Database error: Failed to create Comment Reply data.",
+    };
+  }
+  revalidatePath(`/t/${forum}/${postID}`);
+  redirect(`/t/${forum}/${postID}`);
+}
+
+export async function createComment(formData: FormData) {
+  const loggedInUser = await auth();
+  const userEmail = loggedInUser?.user?.email?.toString();
+  const user = await getUser(userEmail);
+
+  const { postID, content, forum } = CreateComment.parse({
+    postID: formData.get("postID"),
+    content: formData.get("content"),
+    forum: formData.get("forum"),
+  });
+
+  try {
+    const values = [postID, user.id, content];
+    const insertComment = await query(
+      `
+      INSERT INTO post_comments (post_id, user_id, comment)
+      VALUES ($1, $2, $3)
+      RETURNING *
+    `,
+      values
+    );
+
+    try {
+      const values = [postID, insertComment.rows[0].id, user.id, 1];
+      const insertDefaultUpvote = await query(
+        `
+        INSERT INTO upvoted_comments (post_id, comment_id, user_id, vote)
+        VALUES ($1, $2, $3, $4)
+      `,
+        values
+      );
+    } catch (error) {
+      return {
+        message: "Database error: Failed to create Comment Upvote data.",
+      };
+    }
+  } catch (error) {
+    return {
+      message: "Database error: Failed to create Comment data.",
     };
   }
   revalidatePath(`/t/${forum}/${postID}`);

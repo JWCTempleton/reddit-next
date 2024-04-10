@@ -1,7 +1,7 @@
 import { fetchPost } from "@/app/lib/data";
+import { CreateComment } from "@/app/ui/Comments/CreateComment";
 import { DisplayReplies } from "@/app/ui/Comments/DisplayReplies";
 import PostCard from "@/app/ui/Post/PostCard";
-import Toggleable from "@/app/ui/Toggleable";
 
 export default async function Page({
   params,
@@ -42,19 +42,7 @@ export default async function Page({
                 posted_at={p.created_at}
                 comments={p.comments}
               />
-              <Toggleable buttonLabel={"Comment"}>
-                <div>
-                  <textarea
-                    className="peer block w-[500px] rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500 text-sky-800 mb-4"
-                    id="content"
-                    required
-                    name="content"
-                    rows={6}
-                    placeholder="Enter comment"
-                    minLength={1}
-                  />
-                </div>
-              </Toggleable>
+              <CreateComment postID={postID} forumName={forumName} />
             </div>
           );
         }
